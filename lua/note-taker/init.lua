@@ -1,7 +1,7 @@
 local M = {}
 
 function M.setup()
-	vim.print("Hello, World!")
+    vim.cmd('echo "Hello, World!"')
 end
 
 return M
