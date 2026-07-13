@@ -1,6 +1,6 @@
-local default_opts = require("default_opts")
-local utility = require("utility")
-local notify = require("notify")
+local default_opts = require("note-taker.default_opts")
+local utility = require("note-taker.utility")
+local notify = require("note-taker.notify")
 
 local M = {}
 
