@@ -22,11 +22,13 @@ M.setup = function(opts)
     M.opts = vim.tbl_deep_extend("force", default_opts, opts or {})
     M.opts.path = vim.fn.expand(M.opts.path)
 
-    if not vim.uv.fs_stat(M.opts.path) then
-        utility.touch(M.opts.path)
+    local json_path = M.opts.path .. "/notes.json"
+
+    if not vim.uv.fs_stat(json_path) then
+        utility.touch(json_path)
     end
 
-    local json_decoded = vim.json.decode(vim.fn.readblob(M.opts.path))
+    local json_decoded = vim.json.decode(vim.fn.readblob(json_path))
 
     notify.info(json_decoded)
 end
