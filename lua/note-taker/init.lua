@@ -32,7 +32,7 @@ M.setup = function(opts)
 
     local json_decoded = vim.json.decode(utility.read_file(json_path))
 
-    notify.info(json_decoded)
+    notify.info(tostring(json_decoded))
 end
 
 return M
