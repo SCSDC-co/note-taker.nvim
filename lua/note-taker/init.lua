@@ -8,14 +8,17 @@ local M = {}
 ---@field title string
 ---@field short_desc string
 ---@field path string
-local Note = {
-    title = "",
-    short_desc = "",
-    path = "",
-}
 
 ---@type Note[]
 local notes = {}
+
+local function to_note(data)
+    return {
+        title = data.title or "",
+        short_desc = data.short_desc or "",
+        path = data.path or "",
+    }
+end
 
 M.setup = function(opts)
     ---@type Opts
@@ -31,6 +34,12 @@ M.setup = function(opts)
     end
 
     local json_decoded = vim.json.decode(utility.read_file(json_path))
+
+    for _, value in ipairs(json_decoded.notes) do
+        table.insert(notes, to_note(value))
+    end
+
+    vim.print(notes)
 end
 
 return M
