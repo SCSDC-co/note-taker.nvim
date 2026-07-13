@@ -27,10 +27,10 @@ M.setup = function(opts)
     local json_path = M.opts.path .. "notes.json"
 
     if not vim.uv.fs_stat(json_path) then
-        utility.touch(json_path)
+        utility.create_file(json_path)
     end
 
-    local json_decoded = vim.json.decode(vim.fn.readblob(json_path))
+    local json_decoded = vim.json.decode(utility.read_file(json_path))
 
     notify.info(json_decoded)
 end
