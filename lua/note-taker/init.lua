@@ -22,7 +22,9 @@ M.setup = function(opts)
     M.opts = vim.tbl_deep_extend("force", default_opts, opts or {})
     M.opts.path = vim.fn.expand(M.opts.path)
 
-    local json_path = M.opts.path .. "/notes.json"
+    vim.fs.mkdir(M.opts.path)
+
+    local json_path = M.opts.path .. "notes.json"
 
     if not vim.uv.fs_stat(json_path) then
         utility.touch(json_path)
