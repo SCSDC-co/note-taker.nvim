@@ -1,4 +1,4 @@
-<div alignment=center>
+<div align=center>
 
 # Note Taker
 
