@@ -31,8 +31,6 @@ M.setup = function(opts)
     end
 
     local json_decoded = vim.json.decode(utility.read_file(json_path))
-
-    vim.print(json_decoded)
 end
 
 return M
