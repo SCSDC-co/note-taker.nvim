@@ -8,7 +8,7 @@ M.select_note = function(notes)
     local notes_titles = {}
 
     for _, note in ipairs(notes) do
-        table.insert(notes_titles, Menu.item(note.title))
+        table.insert(notes_titles, Menu.item(note.title .. " - " .. note.short_desc))
     end
 
     local menu = Menu({
