@@ -1,14 +1,45 @@
+local Menu = require("nui.menu")
+local event = require("nui.utils.autocmd").event
+
 local M = {}
 
 M.select_note = function(notes)
-    vim.ui.select(notes, {
-        prompt = "Select the note to modify",
-        format_item = function(item)
-            return item.title
+    local menu = Menu({
+        position = "50%",
+        size = {
+            width = 25,
+            height = 5,
+        },
+        border = {
+            style = "rounded",
+            text = {
+                top = " Notes ",
+                top_align = "center",
+            },
+        },
+        win_options = {
+            winhighlight = "Normal:Normal,FloatBorder:Normal",
+        },
+    }, {
+        lines = function()
+            for _, note in ipairs(notes) do
+                Menu.item(note.title)
+            end
         end,
-    }, function(choise)
-        vim.print("You choose: " .. choise)
-    end)
+        max_width = 20,
+        keymap = {
+            focus_next = { "j", "<Down>", "<Tab>" },
+            focus_prev = { "k", "<Up>", "<S-Tab>" },
+            close = { "<Esc>", "<C-c>" },
+            submit = { "<CR>", "<Space>" },
+        },
+        on_close = function() end,
+        on_submit = function(item)
+            vim.print("You selected: ", item.text)
+        end,
+    })
+
+    menu:mount()
 end
 
 return M
