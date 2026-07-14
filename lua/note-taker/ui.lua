@@ -47,9 +47,11 @@ M.select_note = function(notes)
             close = { "q", "<Esc>", "<C-c>" },
             submit = { "<CR>", "<Space>" },
         },
-        on_close = function() end,
+        on_close = function()
+            notify.info("Nothing selected!")
+        end,
         on_submit = function(item)
-            notify.info("Note selected: " .. vim.inspect(item))
+            notify.info("Note selected: " .. item.text)
         end,
     })
 
