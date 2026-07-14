@@ -49,7 +49,7 @@ M.select_note = function(notes)
         },
         on_close = function() end,
         on_submit = function(item)
-            notify.info("Note selected: " .. item)
+            notify.info("Note selected: " .. vim.inspect(item))
         end,
     })
 
