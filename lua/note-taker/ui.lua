@@ -7,14 +7,23 @@ local M = {}
 M.select_note = function(notes)
     local notes_titles = {}
 
+    local longest = string.len(notes[1].title .. " - " .. notes[1].short_desc)
+
     for _, note in ipairs(notes) do
-        table.insert(notes_titles, Menu.item(note.title .. " - " .. note.short_desc))
+        local note_string = (note.title .. " - " .. note.short_desc)
+        local note_string_length = string.len(note_string)
+
+        table.insert(notes_titles, Menu.item(note_string))
+
+        if note_string_length > longest then
+            longest = note_string_length
+        end
     end
 
     local menu = Menu({
         position = "50%",
         size = {
-            width = 25,
+            width = longest,
             height = 5,
         },
         border = {
@@ -29,7 +38,7 @@ M.select_note = function(notes)
         },
     }, {
         lines = notes_titles,
-        max_width = 20,
+        max_width = longest,
         keymap = {
             focus_next = { "j", "<Down>", "<Tab>" },
             focus_prev = { "k", "<Up>", "<S-Tab>" },
