@@ -4,6 +4,12 @@ local event = require("nui.utils.autocmd").event
 local M = {}
 
 M.select_note = function(notes)
+    local notes_titles = {}
+
+    for _, note in ipairs(notes) do
+        table.insert(notes_titles, note.title)
+    end
+
     local menu = Menu({
         position = "50%",
         size = {
@@ -21,11 +27,7 @@ M.select_note = function(notes)
             winhighlight = "Normal:Normal,FloatBorder:Normal",
         },
     }, {
-        lines = function()
-            for _, note in ipairs(notes) do
-                Menu.item(note.title)
-            end
-        end,
+        lines = notes_titles,
         max_width = 20,
         keymap = {
             focus_next = { "j", "<Down>", "<Tab>" },
