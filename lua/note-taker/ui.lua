@@ -35,7 +35,7 @@ M.select_note = function(notes)
             },
         },
         win_options = {
-            winhighlight = "Normal:Normal,FloatBorder:Fg",
+            winhighlight = "Normal:Normal,FloatBorder:FloatBorder",
         },
     }, {
         lines = notes_titles,
