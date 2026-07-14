@@ -21,10 +21,11 @@ M.select_note = function(notes)
     end
 
     local menu = Menu({
+        relative = "editor",
         position = "50%",
         size = {
             width = longest,
-            height = 5,
+            height = #notes,
         },
         border = {
             style = "rounded",
@@ -34,7 +35,7 @@ M.select_note = function(notes)
             },
         },
         win_options = {
-            winhighlight = "Normal:Normal,FloatBorder:Normal",
+            winhighlight = "Normal:Normal,FloatBorder:Fg",
         },
     }, {
         lines = notes_titles,
