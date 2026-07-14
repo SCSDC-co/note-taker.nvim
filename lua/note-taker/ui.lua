@@ -3,11 +3,12 @@ local event = require("nui.utils.autocmd").event
 
 local M = {}
 
+---@param notes Note[]
 M.select_note = function(notes)
     local notes_titles = {}
 
     for _, note in ipairs(notes) do
-        table.insert(notes_titles, note.title)
+        table.insert(notes_titles, Menu.item(note.title))
     end
 
     local menu = Menu({
@@ -32,7 +33,7 @@ M.select_note = function(notes)
         keymap = {
             focus_next = { "j", "<Down>", "<Tab>" },
             focus_prev = { "k", "<Up>", "<S-Tab>" },
-            close = { "<Esc>", "<C-c>" },
+            close = { "q", "<Esc>", "<C-c>" },
             submit = { "<CR>", "<Space>" },
         },
         on_close = function() end,
