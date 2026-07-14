@@ -2,6 +2,7 @@ local default_opts = require("note-taker.default_opts")
 local utility = require("note-taker.utility")
 local notify = require("note-taker.notify")
 local note = require("note-taker.notes")
+local ui = require("note-taker.ui")
 
 local M = {}
 
@@ -23,8 +24,10 @@ M.setup = function(opts)
     for _, value in ipairs(json_decoded.notes) do
         table.insert(note.notes, note.to_note(value))
     end
+end
 
-    vim.print(note.notes)
+M.show_notes = function()
+    ui.select_note(note.notes)
 end
 
 return M
