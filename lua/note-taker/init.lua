@@ -1,6 +1,5 @@
 local default_opts = require("note-taker.default_opts")
 local utility = require("note-taker.utility")
-local notify = require("note-taker.notify")
 local note = require("note-taker.notes")
 local ui = require("note-taker.ui")
 

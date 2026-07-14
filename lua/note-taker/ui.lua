@@ -1,5 +1,6 @@
 local Menu = require("nui.menu")
 local event = require("nui.utils.autocmd").event
+local notify = require("note-taker.notify")
 
 local M = {}
 
@@ -48,7 +49,7 @@ M.select_note = function(notes)
         },
         on_close = function() end,
         on_submit = function(item)
-            vim.print("You selected: ", item.text)
+            notify.info("Note selected: " .. item)
         end,
     })
 
