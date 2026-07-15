@@ -74,6 +74,10 @@ M.create_note = function()
         input_path:unmount()
     end, { noremap = true })
 
+    input_path:on({ event.WinNew }, function()
+        vim.opt_local.sidescrolloff = 0
+    end, { once = false })
+
     local input_desc = Input(create_input_table("Note Desc"), {
         prompt = "",
         default_value = "",
@@ -92,6 +96,10 @@ M.create_note = function()
         input_desc:unmount()
     end, { noremap = true })
 
+    input_desc:on({ event.WinNew }, function()
+        vim.opt_local.sidescrolloff = 0
+    end, { once = false })
+
     local input_title = Input(create_input_table("Note Title"), {
         prompt = "",
         default_value = "",
@@ -109,6 +117,10 @@ M.create_note = function()
     input_title:map("n", "q", function()
         input_title:unmount()
     end, { noremap = true })
+
+    input_title:on({ event.WinNew }, function()
+        vim.opt_local.sidescrolloff = 0
+    end, { once = false })
 
     input_title:mount()
 end
