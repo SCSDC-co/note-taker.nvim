@@ -60,12 +60,11 @@ M.select_note = function(notes)
 end
 
 ---@param text string
----@return string
 M.get_input = function(text)
     local input_popup = Input({
         relative = "editor",
         position = "50%",
-        size = 20,
+        size = string.len(text) + 2,
         border = {
             style = "rounded",
             text = {
@@ -94,9 +93,6 @@ M.get_input = function(text)
     end, { noremap = true })
 
     input_popup:mount()
-
-    -- this is just a dummy return
-    return ""
 end
 
 return M
