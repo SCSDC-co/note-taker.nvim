@@ -26,6 +26,9 @@ local function create_input_table(text)
 end
 
 local function load_json()
+    -- we need to empty the notes first, if not there will be duplicates
+    note.notes = {}
+
     local json_decoded = vim.json.decode(utility.read_file(M.json_path))
 
     for _, value in ipairs(json_decoded.notes) do
