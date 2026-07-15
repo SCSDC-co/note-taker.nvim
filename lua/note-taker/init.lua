@@ -74,7 +74,7 @@ M.create_note = function()
         input_path:unmount()
     end, { noremap = true })
 
-    input_path:on({ event.WinNew }, function()
+    input_path:on({ event.WinEnter }, function()
         vim.opt_local.sidescrolloff = 0
     end, { once = false })
 
@@ -96,7 +96,7 @@ M.create_note = function()
         input_desc:unmount()
     end, { noremap = true })
 
-    input_desc:on({ event.WinNew }, function()
+    input_desc:on({ event.WinEnter }, function()
         vim.opt_local.sidescrolloff = 0
     end, { once = false })
 
@@ -118,7 +118,7 @@ M.create_note = function()
         input_title:unmount()
     end, { noremap = true })
 
-    input_title:on({ event.WinNew }, function()
+    input_title:on({ event.WinEnter }, function()
         vim.opt_local.sidescrolloff = 0
     end, { once = false })
 
