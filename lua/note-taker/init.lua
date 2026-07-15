@@ -47,11 +47,11 @@ M.setup = function(opts)
     if not vim.uv.fs_stat(M.json_path) then
         utility.create_file(M.json_path)
     end
-
-    load_json()
 end
 
 M.show_notes = function()
+    load_json()
+
     ui.select_note(note.notes)
 end
 
@@ -130,8 +130,6 @@ M.create_note = function()
     end, { once = false })
 
     input_title:mount()
-
-    load_json()
 end
 
 return M
