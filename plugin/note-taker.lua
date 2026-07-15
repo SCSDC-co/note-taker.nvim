@@ -7,7 +7,7 @@ vim.api.nvim_create_user_command("Note", function(opts)
         note_taker.create_note()
     end
 end, {
-    nargs = 1,
+    nargs = 0,
 
     complete = function(ArgLead, CmdLine, CursorPos)
         return { "new", "list" }

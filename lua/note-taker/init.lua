@@ -65,12 +65,6 @@ M.create_note = function(additional_panel)
                 { title = note_title, short_desc = note_desc, path = note_path },
                 M.json_path
             )
-
-            load_json()
-
-            if additional_panel then
-                additional_panel:mount()
-            end
         end,
     })
 
@@ -141,7 +135,7 @@ M.show_notes = function()
     menu:map("n", "a", function(bufnr)
         menu:unmount()
 
-        M.create_note(menu)
+        M.create_note()
     end)
 
     menu:mount()
