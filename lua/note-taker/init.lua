@@ -33,7 +33,7 @@ local function load_json()
 
     local json_decoded = vim.json.decode(utility.read_file(M.json_path))
 
-    for _, value in ipairs(json_decoded.notes) do
+    for _, value in ipairs(json_decoded) do
         table.insert(note.notes, note.to_note(value))
     end
 end
