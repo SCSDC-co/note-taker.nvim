@@ -1,5 +1,4 @@
 local utility = require("note-taker.utility")
-
 local M = {}
 
 ---@class Note
@@ -37,9 +36,9 @@ end
 M.add_note = function(note, json_path)
     local json_decoded = vim.json.decode(utility.read_file(json_path))
 
-    note.id = #json_decoded["notes"] + 1
+    note.id = #json_decoded + 1
 
-    json_decoded["notes"][#json_decoded["notes"] + 1] = note
+    json_decoded[#json_decoded + 1] = note
 
     local new_json = vim.json.encode(json_decoded, { indent = "  " })
 
@@ -53,7 +52,7 @@ M.remove_note = function(id, json_path)
 
     local final_table = {}
 
-    for _, value in pairs(json_decoded["notes"]) do
+    for _, value in pairs(json_decoded) do
         if value["id"] ~= id then
             table.insert(final_table, value)
         end

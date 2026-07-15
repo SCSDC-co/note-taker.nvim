@@ -47,7 +47,7 @@ M.setup = function(opts)
     vim.uv.fs_mkdir(M.opts.path, 0755)
 
     if not vim.uv.fs_stat(M.json_path) then
-        utility.create_file(M.json_path, '{ "notes": [] }')
+        utility.create_file(M.json_path, "[]")
     end
 end
 
