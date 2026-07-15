@@ -191,8 +191,8 @@ M.remove_notes = function()
             notify.info("Nothing selected!")
         end,
         on_submit = function(item)
-            note.remove_note(tonumber(item.text[1]), M.json_path)
-            notify.info("Note removed: " .. item.text[1])
+            note.remove_note(tonumber(item.text:sub(1, 1)), M.json_path)
+            notify.info("Note removed: " .. item.text:sub(1, 1))
         end,
     })
 
