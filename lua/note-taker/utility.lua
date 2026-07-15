@@ -2,12 +2,14 @@ local notify = require("note-taker.notify")
 
 local M = {}
 
-M.create_file = function(path)
+M.create_file = function(path, text)
     local file = io.open(path, "w")
 
     if not file then
         notify.error("Cannot create file " .. path .. ".")
     else
+        file:write(vim.json.encode(text, { indent = "  " }))
+
         file:close()
     end
 end

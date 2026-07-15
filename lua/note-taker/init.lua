@@ -1,7 +1,9 @@
 local default_opts = require("note-taker.default_opts")
+local notify = require("note-taker.notify")
 local utility = require("note-taker.utility")
 local note = require("note-taker.notes")
 local ui = require("note-taker.ui")
+local Menu = require("nui.menu")
 local Input = require("nui.input")
 local event = require("nui.utils.autocmd").event
 
@@ -45,11 +47,11 @@ M.setup = function(opts)
     vim.uv.fs_mkdir(M.opts.path, 0755)
 
     if not vim.uv.fs_stat(M.json_path) then
-        utility.create_file(M.json_path)
+        utility.create_file(M.json_path, '{ "notes": [] }')
     end
 end
 
-M.create_note = function(additional_panel)
+M.create_note = function()
     local note_title = ""
     local note_desc = ""
     local note_path = ""
@@ -62,7 +64,7 @@ M.create_note = function(additional_panel)
             note_path = value
 
             note.add_note(
-                { title = note_title, short_desc = note_desc, path = note_path },
+                { title = note_title, short_desc = note_desc, path = note_path, id = 0 },
                 M.json_path
             )
         end,
@@ -137,6 +139,62 @@ M.show_notes = function()
 
         M.create_note()
     end)
+
+    menu:mount()
+end
+
+M.remove_notes = function()
+    local notes_titles = {}
+
+    local longest = string.len(
+        note.notes[1].id .. ". " .. note.notes[1].title .. " - " .. note.notes[1].short_desc
+    )
+
+    for _, _note in ipairs(note.notes) do
+        local note_string = (_note.id .. ". " .. _note.title .. " - " .. _note.short_desc)
+        local note_string_length = string.len(note_string)
+
+        table.insert(notes_titles, Menu.item(note_string))
+
+        if note_string_length > longest then
+            longest = note_string_length
+        end
+    end
+
+    local menu = Menu({
+        relative = "editor",
+        position = "50%",
+        size = {
+            width = longest,
+            height = #note.notes,
+        },
+        border = {
+            style = "rounded",
+            text = {
+                top = " Notes ",
+                top_align = "center",
+            },
+        },
+        win_options = {
+            winhighlight = "Normal:Normal,FloatBorder:FloatBorder",
+        },
+    }, {
+        lines = notes_titles,
+        max_width = longest,
+        keymap = {
+            focus_next = { "j", "<Down>", "<Tab>" },
+            focus_prev = { "k", "<Up>", "<S-Tab>" },
+            close = { "q", "<Esc>", "<C-c>" },
+            submit = { "<CR>", "<Space>" },
+        },
+        on_close = function()
+            notify.info("Nothing selected!")
+        end,
+        on_submit = function(item)
+            note.remove_note(tonumber(item.text[1]), M.json_path)
+            notify.info("Note removed: " .. item.text[1])
+        end,
+    })
 
     menu:mount()
 end
