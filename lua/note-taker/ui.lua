@@ -90,6 +90,8 @@ M.get_input = function(text)
         end,
     })
 
+    input_popup:mount()
+
     return input
 end
 
