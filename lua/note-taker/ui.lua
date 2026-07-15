@@ -1,4 +1,5 @@
 local Menu = require("nui.menu")
+local Input = require("nui.input")
 local event = require("nui.utils.autocmd").event
 local notify = require("note-taker.notify")
 
@@ -56,6 +57,40 @@ M.select_note = function(notes)
     })
 
     menu:mount()
+end
+
+---@param text string
+---@return string
+M.get_input = function(text)
+    local input = ""
+
+    local input_popup = Input({
+        relative = "editor",
+        position = {
+            row = 1,
+            col = 0,
+        },
+        size = 20,
+        border = {
+            style = "rounded",
+            text = {
+                top = text,
+                top_align = "center",
+            },
+        },
+        win_options = {
+            winhighlight = "Normal:Normal,FloatBorder:FloatBorder",
+        },
+    }, {
+        prompt = "",
+        default_value = "",
+        on_close = function() end,
+        on_submit = function(value)
+            input = value
+        end,
+    })
+
+    return input
 end
 
 return M
