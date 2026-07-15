@@ -62,19 +62,14 @@ end
 ---@param text string
 ---@return string
 M.get_input = function(text)
-    local input = ""
-
     local input_popup = Input({
         relative = "editor",
-        position = {
-            row = 1,
-            col = 0,
-        },
+        position = "50%",
         size = 20,
         border = {
             style = "rounded",
             text = {
-                top = text,
+                top = " " .. text .. " ",
                 top_align = "center",
             },
         },
@@ -86,13 +81,22 @@ M.get_input = function(text)
         default_value = "",
         on_close = function() end,
         on_submit = function(value)
-            input = value
+            return value
         end,
     })
 
+    input_popup:map("n", "<Esc>", function()
+        input_popup:unmount()
+    end, { noremap = true })
+
+    input_popup:map("n", "q", function()
+        input_popup:unmount()
+    end, { noremap = true })
+
     input_popup:mount()
 
-    return input
+    -- this is just a dummy return
+    return ""
 end
 
 return M
