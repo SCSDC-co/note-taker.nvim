@@ -59,6 +59,10 @@ M.create_note = function()
         on_close = function() end,
         on_submit = function(value)
             note_path = value
+            note.add_note(
+                { title = note_title, short_desc = note_desc, path = note_path },
+                M.json_path
+            )
         end,
     })
 
@@ -107,8 +111,6 @@ M.create_note = function()
     end, { noremap = true })
 
     input_title:mount()
-
-    note.add_note({ title = note_title, short_desc = note_desc, path = note_path }, M.json_path)
 end
 
 return M
