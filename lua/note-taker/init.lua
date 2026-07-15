@@ -25,6 +25,14 @@ local function create_input_table(text)
     }
 end
 
+local function load_json()
+    local json_decoded = vim.json.decode(utility.read_file(M.json_path))
+
+    for _, value in ipairs(json_decoded.notes) do
+        table.insert(note.notes, note.to_note(value))
+    end
+end
+
 M.setup = function(opts)
     ---@type Opts
     M.opts = vim.tbl_deep_extend("force", default_opts, opts or {})
@@ -37,11 +45,7 @@ M.setup = function(opts)
         utility.create_file(M.json_path)
     end
 
-    local json_decoded = vim.json.decode(utility.read_file(M.json_path))
-
-    for _, value in ipairs(json_decoded.notes) do
-        table.insert(note.notes, note.to_note(value))
-    end
+    load_json()
 end
 
 M.show_notes = function()
@@ -123,6 +127,8 @@ M.create_note = function()
     end, { once = false })
 
     input_title:mount()
+
+    load_json()
 end
 
 return M
