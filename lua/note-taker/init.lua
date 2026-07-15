@@ -132,7 +132,11 @@ M.show_notes = function()
     local menu = ui.select_note(note.notes)
 
     menu:map("n", "a", function(bufnr)
+        menu:unmount()
+
         M.create_note()
+
+        menu:mount()
     end)
 
     menu:mount()
