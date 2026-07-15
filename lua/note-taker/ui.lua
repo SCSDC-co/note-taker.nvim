@@ -6,9 +6,11 @@ local M = {}
 
 ---@param notes Note[]
 M.select_note = function(notes)
+    local footer = " a: Create Note "
+
     local notes_titles = {}
 
-    local longest = string.len(notes[1].title .. " - " .. notes[1].short_desc)
+    local longest = string.len(footer)
 
     for _, note in ipairs(notes) do
         local note_string = (note.title .. " - " .. note.short_desc)
@@ -33,6 +35,8 @@ M.select_note = function(notes)
             text = {
                 top = " Notes ",
                 top_align = "center",
+                bottom = footer,
+                bottom_align = "right",
             },
         },
         win_options = {
@@ -55,7 +59,7 @@ M.select_note = function(notes)
         end,
     })
 
-    menu:mount()
+    return menu
 end
 
 return M

@@ -49,12 +49,6 @@ M.setup = function(opts)
     end
 end
 
-M.show_notes = function()
-    load_json()
-
-    ui.select_note(note.notes)
-end
-
 M.create_note = function()
     local note_title = ""
     local note_desc = ""
@@ -130,6 +124,18 @@ M.create_note = function()
     end, { once = false })
 
     input_title:mount()
+end
+
+M.show_notes = function()
+    load_json()
+
+    local menu = ui.select_note(note.notes)
+
+    menu:map("n", "a", function(bufnr)
+        M.create_note()
+    end)
+
+    menu:mount()
 end
 
 return M
