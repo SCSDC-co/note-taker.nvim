@@ -5,12 +5,11 @@ local ui = require("note-taker.ui")
 
 local M = {}
 
-M.json_path = M.opts.path .. "notes.json"
-
 M.setup = function(opts)
     ---@type Opts
     M.opts = vim.tbl_deep_extend("force", default_opts, opts or {})
     M.opts.path = vim.fn.expand(M.opts.path)
+    M.json_path = M.opts.path .. "notes.json"
 
     vim.uv.fs_mkdir(M.opts.path, 0755)
 
