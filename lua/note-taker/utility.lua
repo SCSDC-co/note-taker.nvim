@@ -15,7 +15,7 @@ M.create_file = function(path, text)
 end
 
 M.create_dir = function(path)
-    vim.uv.fs_mkdir(path, 0755)
+    vim.uv.fs_mkdir(path, tonumber("755", 8))
 end
 
 ---@return string
