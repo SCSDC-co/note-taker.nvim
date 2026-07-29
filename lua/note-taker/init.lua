@@ -13,7 +13,7 @@ local function create_input_table(text)
     return {
         relative = "editor",
         position = "50%",
-        size = string.len(text) + 2,
+        size = string.len(text) + 8,
         border = {
             style = "rounded",
             text = {
@@ -42,6 +42,11 @@ M.setup = function(opts)
     ---@type Opts
     M.opts = vim.tbl_deep_extend("force", default_opts, opts or {})
     M.opts.path = vim.fn.expand(M.opts.path)
+
+    if M.opts.path:sub(-1) ~= "/" then
+        M.opts.path = M.opts.path + "/"
+    end
+
     M.json_path = M.opts.path .. "notes.json"
 
     vim.uv.fs_mkdir(M.opts.path, tonumber("755", 8))
