@@ -52,7 +52,7 @@ M.remove_note = function(id, json_path)
 
     local final_table = {}
 
-    for _, value in pairs(json_decoded) do
+    for _, value in ipairs(json_decoded) do
         if value["id"] ~= id then
             table.insert(final_table, value)
         end
