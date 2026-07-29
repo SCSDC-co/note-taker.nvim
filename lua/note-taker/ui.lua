@@ -4,6 +4,22 @@ local notify = require("note-taker.notify")
 
 local M = {}
 
+---@param path string
+local function open_note_path(path)
+    local expanded_path = vim.fn.expand(path or "")
+
+    if expanded_path == "" then
+        notify.error("Note path is empty!")
+        return
+    end
+
+    local success, error_message = pcall(vim.cmd.edit, vim.fn.fnameescape(expanded_path))
+
+    if not success then
+        notify.error("Cannot open note: " .. error_message)
+    end
+end
+
 ---@param notes Note[]
 M.select_note = function(notes)
     local footer = " a: Create Note "
@@ -16,7 +32,7 @@ M.select_note = function(notes)
         local note_string = (note.title .. " - " .. note.short_desc)
         local note_string_length = string.len(note_string)
 
-        table.insert(notes_titles, Menu.item(note_string))
+        table.insert(notes_titles, Menu.item(note_string, { path = note.path }))
 
         if note_string_length > longest then
             longest = note_string_length
@@ -55,7 +71,7 @@ M.select_note = function(notes)
             notify.info("Nothing selected!")
         end,
         on_submit = function(item)
-            notify.info("Note selected: " .. item.text)
+            open_note_path(item.path)
         end,
     })
 
