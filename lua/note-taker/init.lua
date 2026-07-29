@@ -132,6 +132,11 @@ end
 M.show_notes = function()
     load_json()
 
+    if #note.notes == 0 then
+        notify.info("No notes found!")
+        return
+    end
+
     local menu = ui.select_note(note.notes)
 
     menu:map("n", "a", function(bufnr)
@@ -144,6 +149,13 @@ M.show_notes = function()
 end
 
 M.remove_notes = function()
+    load_json()
+
+    if #note.notes == 0 then
+        notify.info("No notes to remove!")
+        return
+    end
+
     local notes_titles = {}
 
     local longest = string.len(
@@ -154,7 +166,7 @@ M.remove_notes = function()
         local note_string = (_note.id .. ". " .. _note.title .. " - " .. _note.short_desc)
         local note_string_length = string.len(note_string)
 
-        table.insert(notes_titles, Menu.item(note_string))
+        table.insert(notes_titles, Menu.item(note_string, { id = _note.id }))
 
         if note_string_length > longest then
             longest = note_string_length
@@ -191,8 +203,9 @@ M.remove_notes = function()
             notify.info("Nothing selected!")
         end,
         on_submit = function(item)
-            note.remove_note(tonumber(item.text:sub(1, 1)), M.json_path)
-            notify.info("Note removed: " .. item.text:sub(1, 1))
+            note.remove_note(item.id, M.json_path)
+            load_json()
+            notify.info("Note removed: " .. item.id)
         end,
     })
 
