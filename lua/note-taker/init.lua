@@ -9,22 +9,73 @@ local event = require("nui.utils.autocmd").event
 
 local M = {}
 
-local function create_input_table(text)
+local PATH_COMPLETION_DELAY = 75
+local PATH_COMPLETION_LIMIT = 50
+local PATH_INPUT_HINT = "Tab/S-Tab: navigate | Ctrl-y: accept | Enter: create note"
+
+local function create_input_table(text, hint)
+    local width = string.len(text) + 8
+    local border_text = {
+        top = " " .. text .. " ",
+        top_align = "center",
+    }
+
+    if hint then
+        width = math.max(width, vim.fn.strdisplaywidth(hint) + 2)
+        border_text.bottom = " " .. hint .. " "
+        border_text.bottom_align = "center"
+    end
+
     return {
         relative = "editor",
         position = "50%",
-        size = string.len(text) + 8,
+        size = width,
         border = {
             style = "rounded",
-            text = {
-                top = " " .. text .. " ",
-                top_align = "center",
-            },
+            text = border_text,
         },
         win_options = {
             winhighlight = "Normal:Normal,FloatBorder:FloatBorder",
         },
     }
+end
+
+local function show_path_completions(input, value)
+    if
+        value == ""
+        or not vim.api.nvim_buf_is_valid(input.bufnr)
+        or not vim.api.nvim_win_is_valid(input.winid)
+        or vim.api.nvim_get_current_buf() ~= input.bufnr
+        or vim.fn.mode() ~= "i"
+        or vim.fn.pumvisible() == 1
+    then
+        return
+    end
+
+    local matches = vim.fn.getcompletion(value, "file", true)
+
+    if #matches == 0 or (#matches == 1 and matches[1] == value) then
+        return
+    end
+
+    local separator_index = string.match(value, "^.*()[/\\]") or 0
+    local completion_prefix = string.sub(value, 1, separator_index)
+
+    for _, match in ipairs(matches) do
+        if string.sub(match, 1, #completion_prefix) ~= completion_prefix then
+            separator_index = 0
+            completion_prefix = ""
+            break
+        end
+    end
+
+    local completion_items = {}
+
+    for index = 1, math.min(#matches, PATH_COMPLETION_LIMIT) do
+        completion_items[index] = string.sub(matches[index], #completion_prefix + 1)
+    end
+
+    vim.fn.complete(separator_index + 1, completion_items)
 end
 
 local function load_json()
@@ -60,11 +111,25 @@ M.create_note = function()
     local note_title = ""
     local note_desc = ""
     local note_path = ""
+    local path_completion_request = 0
+    local refresh_path_completion = false
 
-    local input_path = Input(create_input_table("Note Path"), {
+    local input_path
+
+    input_path = Input(create_input_table("Note Path", PATH_INPUT_HINT), {
         prompt = "",
         default_value = "",
         on_close = function() end,
+        on_change = function(value)
+            path_completion_request = path_completion_request + 1
+            local request = path_completion_request
+
+            vim.defer_fn(function()
+                if request == path_completion_request then
+                    show_path_completions(input_path, value)
+                end
+            end, PATH_COMPLETION_DELAY)
+        end,
         on_submit = function(value)
             note_path = value
 
@@ -74,6 +139,45 @@ M.create_note = function()
             )
         end,
     })
+
+    vim.api.nvim_set_option_value("completeopt", "menuone,noselect", { buf = input_path.bufnr })
+
+    input_path:map("i", "<Tab>", function()
+        return vim.fn.pumvisible() == 1 and "<C-n>" or "<C-x><C-f>"
+    end, { expr = true, noremap = true, replace_keycodes = true })
+
+    input_path:map("i", "<S-Tab>", function()
+        return vim.fn.pumvisible() == 1 and "<C-p>" or "<C-x><C-f>"
+    end, { expr = true, noremap = true, replace_keycodes = true })
+
+    input_path:map("i", "<C-y>", function()
+        local completion_info = vim.fn.complete_info({ "selected" })
+
+        refresh_path_completion = vim.fn.pumvisible() == 1 and completion_info.selected >= 0
+
+        return "<C-y>"
+    end, { expr = true, noremap = true, replace_keycodes = true })
+
+    input_path:on({ event.CompleteDone }, function()
+        if not refresh_path_completion then
+            return
+        end
+
+        refresh_path_completion = false
+
+        vim.schedule(function()
+            if
+                not vim.api.nvim_buf_is_valid(input_path.bufnr)
+                or not vim.api.nvim_win_is_valid(input_path.winid)
+            then
+                return
+            end
+
+            local value = vim.api.nvim_buf_get_lines(input_path.bufnr, 0, 1, false)[1] or ""
+
+            show_path_completions(input_path, value)
+        end)
+    end)
 
     input_path:map("n", "<Esc>", function()
         input_path:unmount()
