@@ -11,7 +11,7 @@ local M = {}
 
 local PATH_COMPLETION_DELAY = 75
 local PATH_COMPLETION_LIMIT = 50
-local PATH_INPUT_HINT = "Tab/S-Tab: navigate | Ctrl-y: accept | Enter: create note"
+local PATH_INPUT_HINT = "Tab/S-Tab: navigate | Ctrl-y: accept | Enter: continue"
 
 local function create_input_table(text, hint)
     local width = string.len(text) + 8
@@ -78,6 +78,91 @@ local function show_path_completions(input, value)
     vim.fn.complete(separator_index + 1, completion_items)
 end
 
+---@param path string
+---@return boolean
+local function create_empty_file(path)
+    local descriptor, open_error = vim.uv.fs_open(path, "wx", tonumber("644", 8))
+
+    if not descriptor then
+        notify.error("Cannot create file " .. path .. ": " .. open_error)
+        return false
+    end
+
+    local success, close_error = vim.uv.fs_close(descriptor)
+
+    if not success then
+        notify.error("Cannot close file " .. path .. ": " .. close_error)
+        return false
+    end
+
+    return true
+end
+
+---@param path string
+---@param on_confirm fun()
+local function confirm_note_path(path, on_confirm)
+    local expanded_path = vim.fn.expand(path or "")
+
+    if expanded_path == "" then
+        notify.error("Note path is empty!")
+        return
+    end
+
+    local absolute_path = vim.fn.fnamemodify(expanded_path, ":p")
+    local file_stat, stat_error, stat_code = vim.uv.fs_stat(absolute_path)
+
+    if not file_stat and stat_code ~= "ENOENT" then
+        notify.error("Cannot access file " .. absolute_path .. ": " .. stat_error)
+        return
+    end
+
+    if file_stat and file_stat.type ~= "file" then
+        notify.error("Note path is not a file: " .. absolute_path)
+        return
+    end
+
+    local should_create_file = file_stat == nil
+
+    if should_create_file then
+        local parent_path = vim.fs.dirname(absolute_path)
+        local parent_stat = vim.uv.fs_stat(parent_path)
+
+        if not parent_stat or parent_stat.type ~= "directory" then
+            notify.error("Parent directory does not exist: " .. parent_path)
+            return
+        end
+    end
+
+    local confirm_choice = should_create_file and "Create file" or "Link file"
+    local prompt = should_create_file and "Create this file and link it to the note?"
+        or "Link this existing file to the note?"
+
+    vim.ui.select({ confirm_choice, "Cancel" }, {
+        prompt = prompt .. " " .. absolute_path,
+        kind = "note-taker-confirm",
+    }, function(choice)
+        if choice ~= confirm_choice then
+            notify.info("Note creation cancelled.")
+            return
+        end
+
+        if should_create_file then
+            if not create_empty_file(absolute_path) then
+                return
+            end
+        else
+            local current_stat = vim.uv.fs_stat(absolute_path)
+
+            if not current_stat or current_stat.type ~= "file" then
+                notify.error("File is no longer available: " .. absolute_path)
+                return
+            end
+        end
+
+        on_confirm()
+    end)
+end
+
 local function load_json()
     -- we need to empty the notes first, if not there will be duplicates
     note.notes = {}
@@ -133,10 +218,14 @@ M.create_note = function()
         on_submit = function(value)
             note_path = value
 
-            note.add_note(
-                { title = note_title, short_desc = note_desc, path = note_path, id = 0 },
-                M.json_path
-            )
+            confirm_note_path(note_path, function()
+                note.add_note(
+                    { title = note_title, short_desc = note_desc, path = note_path, id = 0 },
+                    M.json_path
+                )
+
+                notify.info("Note created!")
+            end)
         end,
     })
 

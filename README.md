@@ -78,6 +78,9 @@ require("note-taker").setup({
 Inside menus, use `j`/`k` or the arrow keys to move, `Enter` to select, and
 `q` or `Esc` to close.
 
+When creating a note, confirm whether to link an existing file or create a new
+empty file. The parent directory must already exist.
+
 ## License
 
 GNU GPL v3. See [LICENSE](LICENSE).
