@@ -64,8 +64,12 @@ This is the default configuration:
 ```lua
 require("note-taker").setup({
   path = vim.fn.stdpath("data") .. "/note-taker/",
+  confirm_linkage = true,
 })
 ```
+
+`confirm_linkage` defaults to `true`. Set it to `false` to link existing files or
+create missing files immediately after validating the path.
 
 ## Usage
 
@@ -78,8 +82,8 @@ require("note-taker").setup({
 Inside menus, use `j`/`k` or the arrow keys to move, `Enter` to select, and
 `q` or `Esc` to close.
 
-When creating a note, confirm whether to link an existing file or create a new
-empty file. The parent directory must already exist.
+When creating a note, the plugin can link an existing file or create a new empty
+file. The parent directory must already exist.
 
 ## License
 

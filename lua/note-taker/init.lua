@@ -99,8 +99,9 @@ local function create_empty_file(path)
 end
 
 ---@param path string
----@param on_confirm fun()
-local function confirm_note_path(path, on_confirm)
+---@param confirm_linkage boolean
+---@param on_link fun()
+local function prepare_note_path(path, confirm_linkage, on_link)
     local expanded_path = vim.fn.expand(path or "")
 
     if expanded_path == "" then
@@ -133,19 +134,7 @@ local function confirm_note_path(path, on_confirm)
         end
     end
 
-    local confirm_choice = should_create_file and "Create file" or "Link file"
-    local prompt = should_create_file and "Create this file and link it to the note?"
-        or "Link this existing file to the note?"
-
-    vim.ui.select({ confirm_choice, "Cancel" }, {
-        prompt = prompt .. " " .. absolute_path,
-        kind = "note-taker-confirm",
-    }, function(choice)
-        if choice ~= confirm_choice then
-            notify.info("Note creation cancelled.")
-            return
-        end
-
+    local function link_path()
         if should_create_file then
             if not create_empty_file(absolute_path) then
                 return
@@ -159,7 +148,28 @@ local function confirm_note_path(path, on_confirm)
             end
         end
 
-        on_confirm()
+        on_link()
+    end
+
+    if not confirm_linkage then
+        link_path()
+        return
+    end
+
+    local confirm_choice = should_create_file and "Create file" or "Link file"
+    local prompt = should_create_file and "Create this file and link it to the note?"
+        or "Link this existing file to the note?"
+
+    vim.ui.select({ confirm_choice, "Cancel" }, {
+        prompt = prompt .. " " .. absolute_path,
+        kind = "note-taker-confirm",
+    }, function(choice)
+        if choice ~= confirm_choice then
+            notify.info("Note creation cancelled.")
+            return
+        end
+
+        link_path()
     end)
 end
 
@@ -218,7 +228,7 @@ M.create_note = function()
         on_submit = function(value)
             note_path = value
 
-            confirm_note_path(note_path, function()
+            prepare_note_path(note_path, M.opts.confirm_linkage, function()
                 note.add_note(
                     { title = note_title, short_desc = note_desc, path = note_path, id = 0 },
                     M.json_path
