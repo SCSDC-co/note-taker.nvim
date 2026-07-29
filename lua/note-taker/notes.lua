@@ -22,6 +22,28 @@ local function reload_json(json_path, text)
     json_file:close()
 end
 
+---@param notes Note[]
+---@return number
+local function get_first_available_id(notes)
+    local used_ids = {}
+
+    for _, existing_note in ipairs(notes) do
+        local id = existing_note.id
+
+        if type(id) == "number" and id > 0 and id % 1 == 0 then
+            used_ids[id] = true
+        end
+    end
+
+    local id = 1
+
+    while used_ids[id] do
+        id = id + 1
+    end
+
+    return id
+end
+
 M.to_note = function(data)
     return {
         title = data.title or "",
@@ -36,7 +58,7 @@ end
 M.add_note = function(note, json_path)
     local json_decoded = vim.json.decode(utility.read_file(json_path))
 
-    note.id = #json_decoded + 1
+    note.id = get_first_available_id(json_decoded)
 
     json_decoded[#json_decoded + 1] = note
 
